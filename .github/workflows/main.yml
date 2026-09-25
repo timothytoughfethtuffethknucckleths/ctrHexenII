@@ -10,20 +10,19 @@ jobs:
       - name: Checkout Code
         uses: actions/checkout@v4
 
-      - name: Install System Build Essentials
+      - name: Initialize Container Keys & Dependencies
         run: |
-          # The container needs core packages to map out standard Makefiles
-          apt-get update && apt-get install -y wget unzip build-essential
+          # 1. Initialize and sync pacman keys so download feeds aren't blocked
+          pacman-key --init
+          pacman-key --populate archlinux devkitpro
+          
+          # 2. Synchronize databases and pull standard 3DS libraries
+          dkp-pacman -Syyu --noconfirm
+          dkp-pacman -S 3ds-dev 3ds-curl 3ds-bzip2 3ds-libkhax wget unzip --noconfirm
 
-      - name: Install 3DS Dependencies
+      - name: Fetch Compilation Tools (makerom)
         run: |
-          # Clear lock databases and refresh pacman repositories
-                    dkp-pacman -Syyu --noconfirm
-          dkp-pacman -S 3ds-dev 3ds-curl 3ds-bzip2 3ds-libkhax --noconfirm
-
-      - name: Install 3DS Rom Tools (makerom & bannertool)
-        run: |
-          # Fetch and bundle makerom for compilation hooks
+          # 3. Pull makerom directly using native wget inside the workspace
           wget https://github.com
           unzip makerom-v0.17-ubuntu_x86_64.zip
           mv makerom /opt/devkitpro/tools/bin/
@@ -31,6 +30,7 @@ jobs:
 
       - name: Compile Game
         run: |
+          # 4. Explicitly define compiling targets
           export DEVKITPRO=/opt/devkitpro
           export DEVKITARM=$DEVKITPRO/devkitARM
           export PATH=$DEVKITPRO/tools/bin:$PATH
