@@ -40,8 +40,10 @@ jobs:
           export CPLUS_INCLUDE_PATH=$DEVKITPRO/libctru/include:$CPLUS_INCLUDE_PATH
           export LIBRARY_PATH=$DEVKITPRO/libctru/lib:$LIBRARY_PATH
           export PATH=$DEVKITPRO/tools/bin:$DEVKITARM/bin:$PATH
+          
+          # Force the compiler to use permissive legacy C rules
           make clean
-          make
+          make CFLAGS="-O2 -w -fpermissive" CXXFLAGS="-O2 -w -fpermissive"
 
       - name: Upload Finished Files
         uses: actions/upload-artifact@v4
