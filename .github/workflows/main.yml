@@ -16,23 +16,32 @@ jobs:
 
       - name: Download and Install devkitARM Toolchain
         run: |
-          # Create toolchain directories
           sudo mkdir -p /opt/devkitpro
           
-          # Fetch and extract the core devkitARM compiler tools
+          # Fetch and unpack the core devkitARM compiler sets
           wget https://github.com
           sudo tar -xf devkitARM_r56-linux.tar.xz -C /opt/devkitpro/
           
+          # Extract core libctru framework files into place
+          sudo mkdir -p /opt/devkitpro/libctru
+          wget https://github.com
+                    sudo tar -xf libctru-2.1.2.tar.bz2 -C /opt/devkitpro/libctru/
+
           # Fetch and install 3dsxtool, bannertool, and makerom utilities
           wget https://github.com
-                    sudo unzip -o makerom-v0.17-ubuntu_x86_64.zip -d /usr/local/bin
+          sudo unzip -o makerom-v0.17-ubuntu_x86_64.zip -d /usr/local/bin
           sudo chmod +x /usr/local/bin/makerom
 
       - name: Compile Game
         run: |
-          # Manually export the explicit build environment flags for the compiler
+          # Define system anchors
           export DEVKITPRO=/opt/devkitpro
           export DEVKITARM=$DEVKITPRO/devkitARM
+          
+          # Inject full includes and specification maps to protect compiling tracking
+          export C_INCLUDE_PATH=$DEVKITPRO/libctru/include:$C_INCLUDE_PATH
+          export CPLUS_INCLUDE_PATH=$DEVKITPRO/libctru/include:$CPLUS_INCLUDE_PATH
+          export LIBRARY_PATH=$DEVKITPRO/libctru/lib:$LIBRARY_PATH
           export PATH=$DEVKITPRO/tools/bin:$DEVKITARM/bin:$PATH
           
           make clean
@@ -41,7 +50,7 @@ jobs:
       - name: Upload Finished Files
         uses: actions/upload-artifact@v4
         with:
-          name: ctrHexenII-Build
+                  name: ctrHexenII-Build
           path: |
             *.cia
             *.3dsx
