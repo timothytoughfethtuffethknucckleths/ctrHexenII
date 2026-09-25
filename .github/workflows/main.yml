@@ -12,11 +12,19 @@ jobs:
 
       - name: Install 3DS Dependencies
         run: |
-          dkp-pacman -Syu --noconfirm
-          dkp-pacman -S 3ds-libkhax 3ds-curl 3ds-bzip2 3ds-dev --noconfirm
+          # 1. Clear any lock files and explicitly update package databases 
+          # 2. devkitPro containers run as root, so remove 'sudo' if you had it, and use explicit non-interactive flags.
+          dkp-pacman -Syyu --noconfirm
+          
+          # 3. Ensure essential build tools are present
+          dkp-pacman -S 3ds-dev 3ds-curl 3ds-bzip2 3ds-libkhax --noconfirm
 
       - name: Compile Game
+        # 4. We must pass the correct devkitPro paths into the environment so 'make' can find them.
         run: |
+          export DEVKITPRO=/opt/devkitpro
+          export DEVKITARM=$DEVKITPRO/devkitARM
+                   export PATH=$DEVKITPRO/tools/bin:$PATH
           make clean
           make
 
