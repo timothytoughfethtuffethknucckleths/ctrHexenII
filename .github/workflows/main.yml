@@ -18,14 +18,14 @@ jobs:
             3ds-bzip2
             3ds-libkhax
 
-      - name: Download Makerom
+      - name: Prepare Tools and Compile
         run: |
+          # 1. Download and install makerom utility
           sudo wget https://github.com
-          sudo unzip makerom-v0.17-ubuntu_x86_64.zip -d /usr/local/bin
+          sudo unzip -o makerom-v0.17-ubuntu_x86_64.zip -d /usr/local/bin
           sudo chmod +x /usr/local/bin/makerom
 
-                - name: Compile Game
-        run: |
+                    # 2. Run compilation sequence
           make clean
           make
 
