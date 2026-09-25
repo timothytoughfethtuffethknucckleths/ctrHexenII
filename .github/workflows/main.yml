@@ -5,35 +5,30 @@ on: [push, workflow_dispatch]
 jobs:
   build:
     runs-on: ubuntu-latest
-    container: devkitpro/devkitarm:latest
     steps:
       - name: Checkout Code
         uses: actions/checkout@v4
 
-      - name: Initialize Container Keys & Dependencies
-        run: |
-          # 1. Initialize and sync pacman keys so download feeds aren't blocked
-          pacman-key --init
-          pacman-key --populate archlinux devkitpro
-          
-          # 2. Synchronize databases and pull standard 3DS libraries
-          dkp-pacman -Syyu --noconfirm
-          dkp-pacman -S 3ds-dev 3ds-curl 3ds-bzip2 3ds-libkhax wget unzip --noconfirm
+      - name: Install devkitPro & 3DS Toolchain
+        uses: devkitPro/setup-devkitpro@v1
+        with:
+          # Automatically pulls devkitARM and sets up paths
+          dkp-packages: |
+            3ds-dev
+            3ds-curl
+            3ds-bzip2
+            3ds-libkhax
 
-      - name: Fetch Compilation Tools (makerom)
+     - name: Install Compilation Tools (makerom & bannertool)
         run: |
-          # 3. Pull makerom directly using native wget inside the workspace
-          wget https://github.com
-          unzip makerom-v0.17-ubuntu_x86_64.zip
-          mv makerom /opt/devkitpro/tools/bin/
-          chmod +x /opt/devkitpro/tools/bin/makerom
+          # Download makerom and bannertool straight to the system path
+          sudo wget https://github.com
+          sudo unzip makerom-v0.17-ubuntu_x86_64.zip -d /usr/local/bin
+          sudo chmod +x /usr/local/bin/makerom
 
       - name: Compile Game
         run: |
-          # 4. Explicitly define compiling targets
-          export DEVKITPRO=/opt/devkitpro
-          export DEVKITARM=$DEVKITPRO/devkitARM
-          export PATH=$DEVKITPRO/tools/bin:$PATH
+          # setup-devkitpro automatically configures variables, so we just run make
           make clean
           make
 
