@@ -4,28 +4,37 @@ on: [push, workflow_dispatch]
 
 jobs:
   build:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     steps:
       - name: Checkout Code
         uses: actions/checkout@v4
 
-      - name: Install devkitPro & 3DS Toolchain
-        uses: devkitPro/setup-devkitpro@v1
-        with:
-          dkp-packages: |
-            3ds-dev
-            3ds-curl
-            3ds-bzip2
-            3ds-libkhax
-
-      - name: Download Makerom
+      - name: Install System Dependencies
         run: |
-          sudo wget https://github.com
-          sudo unzip makerom-v0.17-ubuntu_x86_64.zip -d /usr/local/bin
+          sudo apt-get update
+          sudo apt-get install -y build-essential wget unzip libc6-i386 lib32stdc++6
+
+      - name: Download and Install devkitARM Toolchain
+        run: |
+          # Create toolchain directories
+          sudo mkdir -p /opt/devkitpro
+          
+          # Fetch and extract the core devkitARM compiler tools
+          wget https://github.com
+          sudo tar -xf devkitARM_r56-linux.tar.xz -C /opt/devkitpro/
+          
+          # Fetch and install 3dsxtool, bannertool, and makerom utilities
+          wget https://github.com
+                    sudo unzip -o makerom-v0.17-ubuntu_x86_64.zip -d /usr/local/bin
           sudo chmod +x /usr/local/bin/makerom
 
-                - name: Compile Game
+      - name: Compile Game
         run: |
+          # Manually export the explicit build environment flags for the compiler
+          export DEVKITPRO=/opt/devkitpro
+          export DEVKITARM=$DEVKITPRO/devkitARM
+          export PATH=$DEVKITPRO/tools/bin:$DEVKITARM/bin:$PATH
+          
           make clean
           make
 
