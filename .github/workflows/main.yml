@@ -10,13 +10,20 @@ jobs:
       - name: Checkout Code
         uses: actions/checkout@v4
 
-      - name: Install 3DS Build Tools and Dependencies
+      - name: Install 3DS Dependencies
         run: |
-          apt-get update && apt-get install -y makerom bannertool
           dkp-pacman -Syu --noconfirm
-          dkp-pacman -S 3ds-libkhax 3ds-curl 3ds-bzip2 --noconfirm
+          dkp-pacman -S 3ds-libkhax 3ds-curl 3ds-bzip2 3ds-dev --noconfirm
 
       - name: Compile Game
         run: |
           make clean
           make
+
+      - name: Upload Finished Files
+        uses: actions/upload-artifact@v4
+        with:
+          name: ctrHexenII-Build
+          path: |
+            *.cia
+            *.3dsx
