@@ -8,12 +8,14 @@ jobs:
     container: devkitpro/devkitarm:latest
     steps:
       - name: Checkout Code
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
 
-      - name: Install 3DS Build Tools
+      - name: Install 3DS Build Tools and Dependencies
         run: |
           apt-get update && apt-get install -y makerom bannertool
-          
+          dkp-pacman -Syu --noconfirm
+          dkp-pacman -S 3ds-libkhax 3ds-curl 3ds-bzip2 --noconfirm
+
       - name: Compile Game
         run: |
           make clean
