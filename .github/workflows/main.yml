@@ -19,14 +19,14 @@ jobs:
             3ds-bzip2
             3ds-libkhax
 
-     - name: Install Compilation Tools (makerom & bannertool)
+      - name: Install Compilation Tools (makerom & bannertool)
         run: |
           # Download makerom and bannertool straight to the system path
           sudo wget https://github.com
           sudo unzip makerom-v0.17-ubuntu_x86_64.zip -d /usr/local/bin
           sudo chmod +x /usr/local/bin/makerom
 
-      - name: Compile Game
+                - name: Compile Game
         run: |
           # setup-devkitpro automatically configures variables, so we just run make
           make clean
