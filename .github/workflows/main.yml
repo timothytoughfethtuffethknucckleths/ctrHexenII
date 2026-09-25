@@ -34,23 +34,19 @@ jobs:
 
       - name: Compile Game
         run: |
-          # Define system anchors
           export DEVKITPRO=/opt/devkitpro
           export DEVKITARM=$DEVKITPRO/devkitARM
-          
-          # Inject full includes and specification maps to protect compiling tracking
           export C_INCLUDE_PATH=$DEVKITPRO/libctru/include:$C_INCLUDE_PATH
           export CPLUS_INCLUDE_PATH=$DEVKITPRO/libctru/include:$CPLUS_INCLUDE_PATH
           export LIBRARY_PATH=$DEVKITPRO/libctru/lib:$LIBRARY_PATH
           export PATH=$DEVKITPRO/tools/bin:$DEVKITARM/bin:$PATH
-          
           make clean
           make
 
       - name: Upload Finished Files
         uses: actions/upload-artifact@v4
         with:
-                  name: ctrHexenII-Build
+          name: ctrHexenII-Build
           path: |
             *.cia
             *.3dsx
