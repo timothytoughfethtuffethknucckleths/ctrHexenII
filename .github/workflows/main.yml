@@ -12,19 +12,16 @@ jobs:
 
       - name: Install 3DS Dependencies
         run: |
-          # 1. Clear any lock files and explicitly update package databases 
-          # 2. devkitPro containers run as root, so remove 'sudo' if you had it, and use explicit non-interactive flags.
+          # Clear lock files and update package databases
           dkp-pacman -Syyu --noconfirm
-          
-          # 3. Ensure essential build tools are present
+          # Ensure essential build tools are present
           dkp-pacman -S 3ds-dev 3ds-curl 3ds-bzip2 3ds-libkhax --noconfirm
 
       - name: Compile Game
-        # 4. We must pass the correct devkitPro paths into the environment so 'make' can find them.
         run: |
           export DEVKITPRO=/opt/devkitpro
           export DEVKITARM=$DEVKITPRO/devkitARM
-                   export PATH=$DEVKITPRO/tools/bin:$PATH
+          export PATH=$DEVKITPRO/tools/bin:$PATH
           make clean
           make
 
@@ -35,9 +32,3 @@ jobs:
           path: |
             *.cia
             *.3dsx
-- name: Install makerom (If required for .cia)
-        run: |
-          wget https://github.com
-          unzip makerom-v0.17-ubuntu_x86_64.zip
-          mv makerom /opt/devkitpro/tools/bin/
-          chmod +x /opt/devkitpro/tools/bin/makerom
