@@ -1,0 +1,20 @@
+name: Build 3DS Homebrew
+
+on: [push, workflow_dispatch]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    container: devkitpro/devkitarm:latest
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v3
+
+      - name: Install 3DS Build Tools
+        run: |
+          apt-get update && apt-get install -y makerom bannertool
+          
+      - name: Compile Game
+        run: |
+          make clean
+          make
