@@ -12,23 +12,20 @@ jobs:
       - name: Install devkitPro & 3DS Toolchain
         uses: devkitPro/setup-devkitpro@v1
         with:
-          # Automatically pulls devkitARM and sets up paths
           dkp-packages: |
             3ds-dev
             3ds-curl
             3ds-bzip2
             3ds-libkhax
 
-      - name: Install Compilation Tools (makerom & bannertool)
+                  - name: Install Compilation Tools (makerom)
         run: |
-          # Download makerom and bannertool straight to the system path
           sudo wget https://github.com
           sudo unzip makerom-v0.17-ubuntu_x86_64.zip -d /usr/local/bin
           sudo chmod +x /usr/local/bin/makerom
 
-                - name: Compile Game
+      - name: Compile Game
         run: |
-          # setup-devkitpro automatically configures variables, so we just run make
           make clean
           make
 
